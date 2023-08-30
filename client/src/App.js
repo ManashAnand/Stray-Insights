@@ -2,12 +2,11 @@ import abi from "./contract/stray.json";
 import { useState, useEffect } from "react";
 import "./App.css";
 import Buy from "./components/Buy";
-import Stray from './components/Stray';
+import Stray from "./components/Stray";
 import { useDispatch } from "react-redux";
 import { addChainData } from "./store/slice/BlockchainSlice";
-const ethers = require("ethers")
-
-
+import Footer from "./components/Footer";
+const ethers = require("ethers");
 
 function App() {
   const [state, setState] = useState({
@@ -18,7 +17,7 @@ function App() {
 
   const dispatch = useDispatch();
 
-  const [account,setAccount] = useState("None")
+  const [account, setAccount] = useState("None");
 
   useEffect(() => {
     const connectWallet = async () => {
@@ -28,58 +27,59 @@ function App() {
         const { ethereum } = window;
         if (ethereum) {
           // console.log("It's the ethereum")
-          // console.log(ethereum) 
+          // console.log(ethereum)
           const accounts = await ethereum.request({
             method: "eth_requestAccounts",
           });
 
-          window.ethereum.on("chainChanged",() => {
+          window.ethereum.on("chainChanged", () => {
             window.location.reload();
-            console.log("Network changed")
-          })
-          window.ethereum.on("accountsChanged",() => {
+            console.log("Network changed");
+          });
+          window.ethereum.on("accountsChanged", () => {
             window.location.reload();
-            console.log("account changed")
-          })
-       
-        
-        const provider = new ethers.BrowserProvider(ethereum);
-        const signer = await provider.getSigner();
-        // Signer jo publish kiya hai smart contract ko uska data 
+            console.log("account changed");
+          });
 
-        const contract = new ethers.Contract(contractAddress,contractAbi,signer);
-        // contract mtlb ek tarah se sol usks sara funciton and variable 
+          const provider = new ethers.BrowserProvider(ethereum);
+          const signer = await provider.getSigner();
+          // Signer jo publish kiya hai smart contract ko uska data
 
-        setAccount(signer?.address)
-        setState({provider,signer,contract})
-        dispatch(addChainData({provider,signer,contract}))
-        // dispatch(addChainData({"manash":"working"}))
+          const contract = new ethers.Contract(
+            contractAddress,
+            contractAbi,
+            signer
+          );
+          // contract mtlb ek tarah se sol usks sara funciton and variable
 
-      }
-      else{
-        // metamask hai hi nhi 
-        alert("Please install metamask")
-      }
+          setAccount(signer?.address);
+          setState({ provider, signer, contract });
+          dispatch(addChainData({ provider, signer, contract }));
+          // dispatch(addChainData({"manash":"working"}))
+        } else {
+          // metamask hai hi nhi
+          alert("Please install metamask");
+        }
       } catch (error) {
-        console.log(error)
+        console.log(error);
       }
     };
     connectWallet();
   }, []);
 
-  // console.log(state)
-  const handleTest = () => {
-    dispatch(addChainData({working:"working"}))
-  }
-
-  return (<>
-    <div className="App">
-    <p>Connected Account - {account}</p>
-      <Buy state={state}></Buy>
-      <Stray state={state}></Stray>
-      <button onClick={handleTest}>test</button>
-    </div>
-  </>);
+  return (
+    <>
+      <div className="App min-h-screen bg-slate-400 ">
+        <div className="border border-black h-24 bg-slate-500 text-white sm:flex justify-between items-center">
+          <div className="sm:mx-4">Stray Insights</div>
+          <div className="sm:mx-4">Connected Account - {account}</div>
+        </div>
+        <Buy />
+        <Stray />
+        <Footer/>
+      </div>
+    </>
+  );
 }
 
 export default App;
